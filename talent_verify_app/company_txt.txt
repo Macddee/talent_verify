@@ -1,0 +1,8 @@
+name; registration_date; registration_number; address; contact_person; number_of_employees; contact_phone; email_address; department_csv
+Xyz LTD1; 2004-08-23; SDBDS83244D2F21; 5833 Rusike Phase 2 marondera; Macdonald; 120; 0783773993; macddeemanana@gmail.com; making out, marying, sleeping, eating
+Xyz LTD2; 2004-08-23; SDBDS83244D2F22; 5833 Rusike Phase 2 marondera; Macdonald; 120; 0783773993; macddeemanana@gmail.com; making out, marying, sleeping, eating
+Xyz LTD3; 2004-08-23; SDBDS83244D2F23; 5833 Rusike Phase 2 marondera; Macdonald; 120; 0783773993; macddeemanana@gmail.com; making out, marying, sleeping, eating
+Xyz LTD4; 2004-08-23; SDBDS83244D2F24; 5833 Rusike Phase 2 marondera; Macdonald; 120; 0783773993; macddeemanana@gmail.com; making out, marying, sleeping, eating
+Xyz LTD5; 2004-08-23; SDBDS83244D2F25; 5833 Rusike Phase 2 marondera; Macdonald; 120; 0783773993; macddeemanana@gmail.com; making out, marying, sleeping, eating
+Xyz LTD6; 2004-08-23; SDBDS83244D2F26; 5833 Rusike Phase 2 marondera; Macdonald; 120; 0783773993; macddeemanana@gmail.com; making out, marying, sleeping, eating
+Xyz LTD7; 2004-08-23; SDBDS83244D2F27; 5833 Rusike Phase 2 marondera; Macdonald; 120; 0783773993; macddeemanana@gmail.com; making out, marying, sleeping, eating

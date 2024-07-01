@@ -10,7 +10,7 @@ class Departments(models.Model):
 
 
 class Company(models.Model):
-    user = models.ForeignKey(User, related_name='company', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='company', on_delete=models.CASCADE, null=True, blank=True)
     department = models.ManyToManyField(Departments)
     name = models.CharField(max_length=200)
     registration_date = models.DateField()
@@ -30,7 +30,10 @@ class Employee(models.Model):
     company = models.ForeignKey(Company, related_name='company', on_delete=models.CASCADE)
     department = models.ManyToManyField(Departments)
     id_number = models.CharField(max_length=200, null=True, blank=True)
-    # companies_hist
+    class Meta:
+        permissions = [
+            
+        ]
 
     def __str__(self):
         return f"{self.user.username} {self.user.first_name}"
@@ -59,3 +62,7 @@ class EmployeeCompanyHistory(models.Model):
     employee = models.ForeignKey(Employee, related_name='employee_company_hist', on_delete=models.CASCADE)
     company = models.ForeignKey(Company, related_name='company_hist', on_delete=models.CASCADE)
     
+
+
+class Upload(models.Model):
+    file = models.FileField(upload_to='uploads/')

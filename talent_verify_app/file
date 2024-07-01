@@ -1,0 +1,417 @@
+[
+    [
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac1xlsx11l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac2xlsx22l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac3xlsx33l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac4xlsx44l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac5xlsxl.manana@tv"
+        }
+    ],
+    [
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac1xlsx11l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac2xlsx22l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac3xlsx33l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac4xlsx44l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac5xlsxl.manana@tv"
+        }
+    ],
+    [
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac1xlsx11l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac2xlsx22l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac3xlsx33l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac4xlsx44l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac5xlsxl.manana@tv"
+        }
+    ],
+    [
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac1xlsx11l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac2xlsx22l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac3xlsx33l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac4xlsx44l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac5xlsxl.manana@tv"
+        }
+    ],
+    [
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac1xlsx11l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac2xlsx22l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac3xlsx33l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac4xlsx44l.manana@tv"
+        },
+        {
+            "error": {
+                "date_started": [
+                    [
+                        "“2023-07-19 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ],
+                "date_left": [
+                    [
+                        "“2024-09-12 00:00:00” value has an invalid date format. It must be in YYYY-MM-DD format."
+                    ]
+                ]
+            },
+            "employee": "mac5xlsxl.manana@tv"
+        }
+    ],
+    {
+        "content": {
+            "username": [
+                "A user with that username already exists."
+            ]
+        },
+        "username": "mac6xlsx2.manana@tv"
+    },
+    {
+        "content": {
+            "username": [
+                "A user with that username already exists."
+            ]
+        },
+        "username": "mac7xlsx3.manana@tv"
+    }
+]
+
+{
+    "departments_csv": "abc",
+    "name": "macddee",
+    "surname": "manana",
+    "id_number": "abc1234",
+    "email": "macd@gmail.com",
+    
+    "duties_csv": "paperwork, netwoking",
+    "role": "IT guy",
+    "date_started": "2013-03-18",
+    "date_left": "2024-03-18"
+    }
+    

@@ -9,19 +9,21 @@ class DepartmentsSerializer(serializers.ModelSerializer):
 
 class CompanySerializer(serializers.ModelSerializer):
     department = serializers.StringRelatedField(many=True)
+    user = serializers.StringRelatedField()
     class Meta:
         model = models.Company
         # fields="__all__"
-        exclude = ["user", "id"]
+        exclude = ["id"]
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     company = serializers.StringRelatedField()
     department = serializers.StringRelatedField(many=True)
+    role_history =serializers.StringRelatedField()
     class Meta:
         model = models.Employee
-        fields="__all__"
+        exclude=['id']
         
 
 class RoleHistorySerializer(serializers.ModelSerializer):
@@ -37,3 +39,9 @@ class EmployeeCompanyHistSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.EmployeeCompanyHistory
         fields="__all__"
+
+
+class UploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Upload
+        fields = ('file')

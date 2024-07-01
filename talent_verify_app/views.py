@@ -1,89 +1,98 @@
 from rest_framework.decorators import api_view
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import login, logout,authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from .models import *
-from django.forms import model_to_dict
 import secrets
 import string
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db import transaction
-from django.db.models import F
-
+from django.db.models import F, Q
+from django.core.mail import send_mail
 
 
 #HELPER FUNCTIONS
 def check_user_type(user):
-    print(f"Checking user type for user {user.username}")
-    print(f"User has company attribute: {hasattr(user, 'company')}")
-    print(f"User has employee attribute: {hasattr(user, 'employee')}")
+    return user.is_staff
 
-    is_company = hasattr(user, 'company')
-    is_employee = hasattr(user, 'employee')
+def send_email_to_generated_user(username, password, email):
+    send_mail(
+        'Welcome to talent verify ',
+        f"""Please check your generated details, here is your login information:\n\nUsername: {username}\nPassword: {password}""",
+        'talentverify@gmail.com',  # Replace with your own email
+        [email],
+        fail_silently=False,
+    )
 
-    if is_company:
-        return "Company"
-    elif is_employee:
-        return "Employee"
-    else:
-        return "User"
-
-the_list  = []
 
 def generate_user(name=None, surname=None, email=None, username=None, passw=None, batch_item=None):
-
+        # Get the 'Employees' group
+    employee_group = Group.objects.get_or_create(name='Employees')
     #check if user creation call is for creating an employee or a company user
 
     if username:
         # potential company users provide their own username so its not non
         uname = username
         password = passw
+        email_address = email
+        is_staff = True
 
-    elif name:
-        # employee users have their usernames automatically gebnerated so username will be none
+    # employee users have their usernames automatically gebnerated either individually or from batch
+    elif name or batch_item: 
         
-        uname = ".".join([name, surname]).lower()
-        uname = "@".join([uname, "tv"])
+        if name: # the user is an employee and its individual creation
+            uname = ".".join([name, surname]).lower()
+            email_address = email
 
+        else:
+            uname = ".".join([batch_item["name"], batch_item["surname"]]).lower()
+            name = batch_item["name"]
+            surname = batch_item["surname"]
+            email_address = batch_item["email"]
+
+        uname = "@".join([uname, "tv"])
         alphabet = string.ascii_letters + string.digits
         password = ''.join(secrets.choice(alphabet) for i in range(10))
-    
+        is_staff = False
     else:
-        # we are batch processing  and will automatically generate an employee but eith data from a file
+        return {"error": "Invalid arguments"}
 
-        uname = ".".join(batch_item["name"], batch_item["surname"]).lower()
-        uname = "@".join([uname, "tv"])
-
-        alphabet = string.ascii_letters + string.digits
-        password = ''.join(secrets.choice(alphabet) for i in range(10))
+    # import pdb
+    # pdb.set_trace()
 
     try:
-        user = User(username=uname.strip(), email=email, first_name=name, last_name=surname)
+        user = User(username=uname.strip(), email=email_address, first_name=name, last_name=surname, is_staff=is_staff)
         user.set_password(password)
         user.full_clean()
         user.save()
 
+        if not check_user_type :
+            user.groups.add(employee_group)
+
     except ValidationError as e:
-        return e.message_dict
+        print("ERRRRRORRRR INNNN USSSEEERRRRR")
+        return {"error": e.message_dict, "username": uname}
     
     except IntegrityError as e:
+        
         if 'unique constraint' in str(e) and 'username' in str(e):
-            return {"content": "A user with this username already exists."}
+            return {"error": f"A user with the username {uname} already exists."}
         else:
             return {"error": str(e)}
         
     else:
-        return user
-    
+        print("USSSEEERRRRR CCCCERRREEEAAAATTTTEEEDD BBBUUUTTT HHHOOOOWWWW")
+        return [user, uname, password, email_address]
     
 
 def create_or_change_role(current_role=None, new_role=None, batch_item=None, employee=None, company=None):
-
+    employee_for_error_message = ""
     #this we creating  a new employee with new roles assigned to em
     if current_role is not None:
         
@@ -95,6 +104,7 @@ def create_or_change_role(current_role=None, new_role=None, batch_item=None, emp
             employee = current_role[4],
             company = current_role[5],
         )
+        employee_for_error_message = f"{current_role[4].user.first_name} {current_role[4].user.last_name}"
 
     #this means that we are its an employee that has beenassigned a role aleady and is changing within the company
     elif new_role:
@@ -106,6 +116,7 @@ def create_or_change_role(current_role=None, new_role=None, batch_item=None, emp
             employee = new_role[4],
             company = new_role[5],
         )
+        employee_for_error_message = f"{new_role[4].user.first_name} {new_role[4].user.last_name}"
     # this means we are doing a bulk upload and we     
     else:
         duties = batch_item["duties_csv"].split(",") #. #strip()
@@ -117,24 +128,28 @@ def create_or_change_role(current_role=None, new_role=None, batch_item=None, emp
             company = company,
 
         )
+        employee_for_error_message = employee
 
-
-
+    print(employee_for_error_message)
     try:
         
         processed_role.full_clean()
         processed_role.save()
 
+    
+
     except ValidationError as e:
-        return Response({"content": e.error_dict})
+        print("ERRRRRORRRR INNNN USSSEEERRRRR RRRROOOLLLEEE TTAABBLEE")
+        return {"error": e.error_dict, "employee": employee_for_error_message}
 
     except IntegrityError as e:
-        return Response({"error": str(e)})
+        print("ERRRRRORRRR INNNN USSSEEERRRRR RRROOOLLLAAAEE TTTAABBLLEE")
+        return {"error": str(e), "employee": employee_for_error_message}
 
     # now to associate the duties in the duty table with the duties provided.
     # this will check if a duty is already there or add the new duty to the table if otherwise
 
-
+    print("CCCRREEEAAATTTTIINNNGG RRROOLLESSS COIOOOREEECT")
     if duties:
         for duty in duties:
             role_duty, result = DutyRole.objects.get_or_create(duty_in_role=duty)
@@ -152,23 +167,27 @@ def create_or_change_role(current_role=None, new_role=None, batch_item=None, emp
 
 
 def create_to_the_employee_table(id_number=None, company=None, generated_employee=None, departments_csv=None, batch_item=None):
-    id_number = ""
-    departments_csv = ""
+    id = ""
+    dept_csv = ""
 
 
  #write data to the Employee table
 
     if batch_item:
         #the case where the users are being created in bulk
-        id_number = batch_item["id_number"]
-        departments_csv = batch_item["departments_csv"]
+        id = batch_item["id_number"]
+        dept_csv = batch_item["departments_csv"]
 
+    else:
+        id = id_number
+        dept_csv = departments_csv
   
     #if not provided then its the case where users are being created normaly, one at a time       
 
+    print(id, dept_csv)
     try:
         proccesed_employee = Employee(
-        id_number=id_number,
+        id_number=id,
         company=company,
         user=generated_employee
         )
@@ -176,10 +195,12 @@ def create_to_the_employee_table(id_number=None, company=None, generated_employe
         proccesed_employee.save()
 
     except ValidationError as e:
-        return Response({"content": e.error_dict})
+        print("ERRRRRORRRR INNNN USSSEEERRRRR EEEMMMPPLOOYYEEE TAAABLLLEE")
+        return {"error": e.error_dict, "user": proccesed_employee.user.username}
     
     except IntegrityError as e:
-        return Response({"error": str(e)})
+        print("ERRRRRORRRR INNNN USSSEEERRRRR EEEEMMMPPLLOOYYEEE TTTAABBBLLEE")
+        return {"error": str(e), "user": proccesed_employee.user.username}
     
     # update the number of employees field in the company table with the addition of the extra 1 employee
     company_update = Company.objects.get(name=company)
@@ -188,7 +209,7 @@ def create_to_the_employee_table(id_number=None, company=None, generated_employe
 
 
     #writing to the departments table
-    departments = departments_csv.split(",")
+    departments = dept_csv.split(",")
     non_existing_departments = []
     existing_departments = []
     non_existing_departments_response = {}
@@ -220,7 +241,7 @@ def create_to_the_employee_table(id_number=None, company=None, generated_employe
     else:
         emp_serializer = EmployeeSerializer(proccesed_employee)
         dpt_response_obj(emp_serializer.data, {"saved employee has departments": "False"})
-
+    print("ADDDDDIIINNNNGGGGG EEEEMPPPLLLOOOYEEEEE SSSSUUUCCEESSS")
     return[
             dpt_response_obj[0], #seperated so i dont work with lists in lists in the create_employee view
             dpt_response_obj[1],
@@ -229,10 +250,89 @@ def create_to_the_employee_table(id_number=None, company=None, generated_employe
         ]
 
 
+def create_to_the_company_table(single_company=None, batch_item=None):
+    if single_company:
+        user                = single_company["user"]          
+        name                = single_company["name"] 
+        registration_date   = single_company["registration_date"] 
+        registration_number = single_company["registration_number"]   
+        address             = single_company["address"]
+        contact_person      = single_company["contact_person"]
+        number_of_employees = single_company["number_of_employees"]   
+        contact_phone       = single_company["contact_phone"]
+        email_address       = single_company["email_address"]
+        department_csv      = single_company["department_csv"]
 
+    else:
+        user                = None         
+        name                = batch_item["name"]
+        registration_date   = batch_item["registration_date"]
+        registration_number = batch_item["registration_number"]
+        address             = batch_item["address"]
+        contact_person      = batch_item["contact_person"]
+        number_of_employees = batch_item["number_of_employees"]
+        contact_phone       = batch_item["contact_phone"]
+        email_address       = batch_item["email_address"]
+        department_csv      = batch_item["department_csv"]
+
+    try: 
+        processed_company = Company(
+            user                = user,          
+            name                = name,   
+            registration_date   = registration_date,  
+            registration_number = registration_number,  
+            address             = address,    
+            contact_person      = contact_person, 
+            number_of_employees = number_of_employees,    
+            contact_phone       = contact_phone,  
+            email_address       = email_address
+        )
+
+        processed_company.full_clean()
+        processed_company.save()
+
+
+    except ValidationError as e:
+        return {"error": e.error_dict, "company": processed_company.name}
+
+    
+    except IntegrityError as e:
+        return {"error": str(e), "company": processed_company.name}
+
+    # now to check if a department already exists and add if its not already there.
+    
+    
+    if department_csv:
+        departments = department_csv.split(",")
+        for departnment_name in departments:
+            departnment_name = departnment_name.strip()#.title()
+
+            department, created = Departments.objects.get_or_create(department=departnment_name)
+
+            processed_company.department.add(department)
+
+        processed_company_serializer = CompanySerializer(processed_company)
+        return {
+            "data": processed_company_serializer.data,
+            "saved company has departments": "True"
+        }       
+    
+    else:
+        processed_company_serializer = CompanySerializer(processed_company)
+        return {"saved company has departments": "False",
+                "data": processed_company_serializer.data
+            }
 
 
 # API METHODS
+@api_view(["POST"])
+def upload(request):
+        file_serializer = UploadSerializer(data=request.data)
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def home(request):
     pass
@@ -260,19 +360,18 @@ def create_user(request):
     # check if the returned employee is an instance of user. or retturn the the exception  
     user = generate_user(name,surname,email,username, password)
    
-    if not isinstance(user, User):
+    if isinstance(user, dict):
         return Response(user)
     
     #lohout any logged in user to avoid not mix companies if the user has been gen
     logout(request)
 
     user_data = {
-        "username": user.username,
-        "email": user.email
+        "username": user[0].username,
+        "email": user[0].email
     }
     
     return Response(user_data, status=status.HTTP_201_CREATED,)
-
 
 
 @api_view(["POST"])
@@ -297,68 +396,43 @@ def logout_user(request):
 
 
 @api_view(["POST"])
-def create_company(request): 
+def change_password(request):
     user = request.user
-    name = request.data.get("name")
-    registration_date = request.data.get("registration_date")
-    registration_number = request.data.get("registration_number")
-    address = request.data.get("address")
-    contact_person = request.data.get("contact_person")
-    number_of_employees = request.data.get("number_of_employees")
-    contact_phone = request.data.get("contact_phone")
-    email_address = request.data.get("email_address")
-    department_csv = request.data.get("department_csv")
+    old_password = request.data.get("old_password")
+    new_password = request.data.get("new_password")
+    if not user.check_password(old_password):
+        return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+    user.set_password(new_password)
+    user.save()
+    return Response({"content": "new password saved"}, status=status.HTTP_202_ACCEPTED)
 
-    if request.user.is_authenticated:
-        try: 
-            processed_company = Company(
-                user                = user,           
-                name                = name,   
-                registration_date   = registration_date,  
-                registration_number = registration_number,    
-                address             = address,    
-                contact_person      = contact_person, 
-                number_of_employees = number_of_employees,    
-                contact_phone       = contact_phone,  
-                email_address       = email_address,
-            )
-            processed_company.full_clean()
-            processed_company.save()
 
-        except ValidationError as e:
-            return Response({"content": e.error_dict})
-        
-        except IntegrityError as e:
-            return Response({"error": str(e)})
+@api_view(["POST"])
+def create_company(request):
+    user = request.user
+    single_company = {
+        "user": user,
+        "name": request.data.get("name"),
+        "registration_date": request.data.get("registration_date"),
+        "registration_number": request.data.get("registration_number"),
+        "address": request.data.get("address"),
+        "contact_person": request.data.get("contact_person"),
+        "number_of_employees": request.data.get("number_of_employees"),
+        "contact_phone": request.data.get("contact_phone"),
+        "email_address": request.data.get("email_address"),
+        "department_csv": request.data.get("department_csv"),
+    }
 
-        # now to check if a department already exists and add if its not already there.
-        departments = department_csv.split(",")
-        
-        if departments:
-            for departnment_name in departments:
-                departnment_name = departnment_name.strip()#.title()
 
-                department, created = Departments.objects.get_or_create(department=departnment_name)
-
-                processed_company.department.add(department)
-
-            processed_company_serializer = CompanySerializer(processed_company)
-            return Response({
-                "data": processed_company_serializer.data,
-                "saved company has departments": "True"
-            },
-            status=status.HTTP_201_CREATED
-            )
-        
+    if user.is_authenticated:
+        if check_user_type(user):
+            company_response_obj = create_to_the_company_table(single_company)
+            return Response(company_response_obj,status=status.HTTP_200_OK)
         else:
-            processed_company_serializer = CompanySerializer(processed_company)
-            return Response({"saved company has departments": "False",
-                             "data": processed_company_serializer.data
-                            },
-                            status=status.HTTP_201_CREATED
-                            )
+            return Response({"content": "None Company users cant create companies"}, status=status.HTTP_403_FORBIDDEN)
 
-    return Response({"content": "Please login first before creacting a company"}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({"content": "Please login first before creacting a company"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 #pre requesits for creating an employee. (associating an employee with the company of the admmin thats creating the eployeee)
@@ -366,32 +440,40 @@ def create_company(request):
 # endpoind to be called directly after login
 @api_view(["GET", "POST"])
 def check_company_user_wants_users_have_many_companies(request):
-    if request.method == "GET":
-        #check if the user is part of many companies and return the one with the name thats sent
-        try:
-            company_names = [company['name'] for company in request.user.company.values('name')]
-            
-            if len(company_names) > 1:
-                return Response({"content": "choose the company you want to login as",
-                                 "user": request.user.username,
-                                "data": company_names},
-                                status=status.HTTP_302_FOUND
-                                )
-            else:
-                return Response({"content":"User only associated to one company."}, status=status.HTTP_204_NO_CONTENT)
-        except:
-                return Response({"content":"You are not associated to any company. Please create one"}, status=status.HTTP_204_NO_CONTENT)
+    if check_user_type(request.user):
 
-    
-    # return only the company that he selects.
-    elif request.method == "POST":
-        company_logged_in_as = Company.objects.filter(name=request.data.get("selected_company")).first()
+        if request.method == "GET":
+            #check if the user is part of many companies and return the one with the name thats sent
+            try:
+                company_names = [company['name'] for company in request.user.company.values('name')]
+                
+                if len(company_names) > 1:
+                    return Response({"content": "choose the company you want to login as",
+                                    "user": request.user.username,
+                                    "data": company_names},
+                                    status=status.HTTP_302_FOUND
+                                    )
+                else:
+                    #put the chosen company in a session variable so that we can look for the compnay when creating an employee
+                    request.session['company_logged_in_as'] = company_names[0]
+                    print(request.session.get("company_logged_in_as"))
+                    return Response({"content":"User only associated to one company.", "company": company_names[0]}, status=status.HTTP_204_NO_CONTENT)
+            except:
+                    return Response({"content":"You are not associated to any company. Please create one"}, status=status.HTTP_204_NO_CONTENT)
+
         
-        #put the chosen company in a session variable so that we can look for the compnay when creating an employee
-        request.session['company_logged_in_as'] = company_logged_in_as.name
-       
-        company_logged_in_as_serializer = CompanySerializer(company_logged_in_as)
-        return Response(company_logged_in_as_serializer.data)
+        # return only the company that he selects.
+        elif request.method == "POST":
+            
+            company_logged_in_as = Company.objects.filter(name=request.data.get("selected_company")).first()
+            
+            #put the chosen company in a session variable so that we can look for the compnay when creating an employee
+            request.session['company_logged_in_as'] = company_logged_in_as.name
+        
+            company_logged_in_as_serializer = CompanySerializer(company_logged_in_as)
+            return Response(company_logged_in_as_serializer.data)
+        
+    return Response({"content": "Invalid Permisions"}, status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(["POST"])
@@ -409,87 +491,86 @@ def create_employee(request):
     role = request.data.get("role")
     date_started = request.data.get("date_started")
     date_left = request.data.get("date_left")
-    
-    
-    with transaction.atomic():
-        # check if the returned employee is an instance of user. or retturn the the exception  
-        generated_employee = generate_user(name, surname, email)
+    # import pdb
+    # pdb.set_trace()  
+    if not request.user.is_authenticated:
+        return Response({"content": "Please login to create an employee"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if not isinstance(generated_employee, User):
-            return Response(generated_employee)
-            
-
-        if request.user.is_authenticated:
-            if check_user_type(request.user) == "Company" and company is not None:
-
-                #create employee contains 4 items, the first 3 are strings the details of created deptatments, and not found departments 
-                #the 4th items is the processed employee which is required in the role table by the create or update role function
-                # this is an instance of the useer saved in the employee table. NOT THE GENERATED ONE
-                create_employee_response_obj = create_to_the_employee_table(id_number,company,generated_employee,departments_csv)
-
-
-                #pass the role creation or changing function a list of the new values
-                current_role = [duties_csv,
-                                role,
-                                date_started,
-                                date_left,
-                                create_employee_response_obj[3], # the proccesed employee, is required to associate the role with the employee 
-                                company,
-                                ]
-
-
-                #getting the response object from the create or update role seperated from create_employee
-                #because this one can also update roles, which is not creating employees
-                role_hist_response_obj = create_or_change_role(current_role)
-
-
-                #extra if to remove the {} in case all dpartmns are present in a company
-                if create_employee_response_obj[2]:
-                    return Response([
-                        {"employee created": "True"},
-                        create_employee_response_obj[0],
-                        create_employee_response_obj[1],
-                        create_employee_response_obj[2],
-                        role_hist_response_obj[1],
-                        role_hist_response_obj[0],
-                        ],
-                        status=status.HTTP_200_OK
-                    )
-                else:
-                    return Response([
-                        {"employee created": "True"},
-                        create_employee_response_obj[0],
-                        create_employee_response_obj[1],
-                        role_hist_response_obj[1],
-                        role_hist_response_obj[0],
-                        ],
-                        status=status.HTTP_200_OK
-                    )
-    
-            else:
-                return Response([
+    if not check_user_type(request.user):
+        return Response([
                     {"content": "User is not a company user"},
                     {"content": "you might want to visit the endpoind check company or create a company"}
                     ],
-                    status=status.HTTP_401_UNAUTHORIZED)
-        else:
-            return Response({"content": "Please login to create an employee"}, status=status.HTTP_401_UNAUTHORIZED)
+                    status=status.HTTP_403_FORBIDDEN)
 
-@api_view(["GET"])
-def create_bulk_employee_from_txt(request):
-    from . import data_models as dm
-    if request.user.is_authenticated:
-        company = request.session.get("company_logged_in_as")
-        if company:
-            with transaction.atomic():
-                log = dm.save_to_db(company)
+    response_data = []
+     
+    #creating a custom error so that users wont be saved when the employee or roles tables make errors.
+    #since all the possible errors are handled, tre exception that triggers the atomic() was offf
+    #so had to create a loop coz the data is a list of dicts with [{error: xx}, error: xx]
+    try:   
+        with transaction.atomic():
+            generated_employee = generate_user(name, surname, email)
+            #check if the returned employee is an instance of user. or retturn the the exception  
+            if isinstance(generated_employee, dict):
+                response_data = generated_employee
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
-                return Response(log, status=status.HTTP_201_CREATED)
+            #create employee contains 4 items, the first 3 are strings the details of created deptatments, and not found departments 
+            #the 4th items is the processed employee which is required in the role table by the create or update role function
+            # this is an instance of the useer saved in the employee table. NOT THE GENERATED ONE
+            create_employee_response_obj = create_to_the_employee_table(id_number,company,generated_employee[0],departments_csv)
+            if "error" in create_employee_response_obj: 
+                response_data = create_employee_response_obj
+                raise IntegrityError
+            
+            
+            #pass the role creation or changing function a list of the new values
+            current_role = [duties_csv,
+                            role,
+                            date_started,
+                            date_left,
+                            create_employee_response_obj[3], # the proccesed employee, is required to associate the role with the employee 
+                            company,
+                        ]
 
+            #getting the response object from the create or update role seperated from create_employee
+            #because this one can also update roles, which is not creating employees
+            role_hist_response_obj = create_or_change_role(current_role)
+
+            
+            if "error" in role_hist_response_obj: 
+                response_data = role_hist_response_obj
+                raise IntegrityError
+                  
+    except IntegrityError:
+        print("errorrr caught")
+        return Response(response_data, status.HTTP_400_BAD_REQUEST)
+
+    print((create_employee_response_obj))
+
+    if "error" not in create_employee_response_obj and "error" not in role_hist_response_obj:
+        create_employee_response_obj.pop(3)
+        response_data = [
+            create_employee_response_obj,
+            role_hist_response_obj
+        ]
+        #send email here
+        try:
+            send_email_to_generated_user(generated_employee[1], password=generated_employee[2], email=generated_employee[3])
+            response_data.append({"mail  content": "Email sucessfuly sent to the user"})
+
+        except:
+            response_data.append({"mail  content": "Email not sent to the user. please send manually."})
+    
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 @api_view(["POST"])
 def change_role(request):
-    
+    if not check_user_type(request.user):
+        return Response({"content": "Invalid Permisions"}, status=status.HTTP_403_FORBIDDEN)
+
     duties_csv =  request.data.get("duties_csv")
     role = request.data.get("role")
     date_started = request.data.get("date_started")
@@ -522,6 +603,9 @@ def change_role(request):
 
 @api_view(["POST"])
 def onbord_exisitng_employee_to_new_company(request):
+    if not check_user_type(request.user):
+        return Response({"content": "Invalid Permisions"}, status=status.HTTP_403_FORBIDDEN)
+    
     new_company = request.session.get("company_logged_in_as")
     username = request.data.get("username")
     departments = request.data.get("departments_csv")
@@ -535,7 +619,7 @@ def onbord_exisitng_employee_to_new_company(request):
     print(user_employee_to_update)
 
     if check_user_type(user_employee_to_update.user) == "Employee":
-        return Response({"content": "You are not a company use"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"content": "You are not a company user"}, status=status.HTTP_401_UNAUTHORIZED)
 
     new_company = Company.objects.get(name=new_company)
 
@@ -567,4 +651,140 @@ def onbord_exisitng_employee_to_new_company(request):
     user_employee_to_update_serializer = EmployeeSerializer(user_employee_to_update)
 
     return Response(user_employee_to_update_serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def search_employees(request):
+    #should be able to search by the following name, employer, position, department, year started, year left
+    name = request.data.get("name")
+    employer = request.data.get("employer")
+    role = request.data.get("role")
+    department = request.data.get("department")
+    year_started = request.data.get("year_started")
+    year_left = request.data.get("year_left")
+
+    query = Q()
+    if name:
+        query &= Q(user__username__icontains=name) | Q(user__first_name__icontains=name) | Q(user__last_name__icontains=name)
+
+    if employer:
+        query &= Q(company__name__icontains=employer)
+    if role:
+        query &= Q(employee__role__icontains = role)
+    if department:
+        query &= Q(department__department__icontains=department)
+    if year_started:
+        query &= Q(employee__date_started__year=year_left)
+    if year_left:
+        query &= Q(employee__date_left__year=year_left)
+
+    q_results =  Employee.objects.filter(query)
+    employee_serializer = EmployeeSerializer(q_results, many=True)
+
+    if q_results:
+        return Response(employee_serializer.data, status=status.HTTP_302_FOUND)
+    else:
+        return Response(employee_serializer.data, status=status.HTTP_404_NOT_FOUND)
+
+def helper_fo_bulk_employee_creation(user, company, save_to_db_fn, generator_fn):
+    if not check_user_type(user):
+        return Response({"content": "Invalid Permisions"}, status=status.HTTP_403_FORBIDDEN)
+    
+    
+    if user.is_authenticated:
+        if check_user_type:
+            company = Company.objects.filter(name = company).first()
+            try:    #creating a custom error so that users wont be saved when the employee or roles tables make errors.
+                with transaction.atomic():  #since all the possible errors are handled, tre exception that triggers the atomic() was offf
+                    log = save_to_db_fn(company, generator_fn)   #so had to create a
+                    # loop needed coz the data is a list of dicts with [{error: xx}, error: xx]
+                    for item in log: 
+                        if "error" in item:
+                            print("errorrr code ran ")
+                            raise IntegrityError
+                    
+            except IntegrityError:
+                print("errorrr caught")
+                return(log, status.HTTP_200_OK)
+            return(log, status.HTTP_200_OK)
+        else: 
+            return("Not a company user", status.HTTP_403_FORBIDDEN)
+    else:
+        return("User not authenticated", status.HTTP_401_UNAUTHORIZED)
+
+@api_view(["GET"])
+def create_bulk_employee_from_txt(request):
+    from . import data_models as dm
+    user = request.user
+    company = request.session.get("company_logged_in_as")
+    response = helper_fo_bulk_employee_creation(user, company, dm.save_employee_to_db, dm.process_employee_txt_file)
+    return Response(response[0], status=response[1])   
+
+
+@api_view(["GET"])
+def create_bulk_employee_from_csv(request):
+    from . import data_models as dm
+    user = request.user
+    company = request.session.get("company_logged_in_as")
+    response = helper_fo_bulk_employee_creation(user, company, dm.save_employee_to_db, dm.process_employee_csv_file)
+    return Response(response[0], status=response[1])
+            
+
+@api_view(["GET"])
+def create_bulk_employee_from_excel(request):
+    from . import data_models as dm
+    user = request.user
+    company = request.session.get("company_logged_in_as")
+    response = helper_fo_bulk_employee_creation(user, company, dm.save_employee_to_db, dm.process_employee_excel_file)
+    return Response(response[0], status=response[1])
+
+
+
+
+@api_view(["GET"])
+def create_bulk_companies_from_txt(request):
+    from . import data_models as dm
+    if request.user.is_authenticated:
+        log = dm.save_company_to_db(dm.process_company_txt_file)
+
+        return Response(log, status=status.HTTP_200_OK)
+    
+    return Response("User not authenticated", status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(["GET"])
+def create_bulk_companies_from_csv(request):
+    from . import data_models as dm
+    if request.user.is_authenticated:
+        log = dm.save_company_to_db(dm.process_company_csv_file)
+
+        return Response(log, status=status.HTTP_200_OK)
+    
+    return Response("User not authenticated", status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(["GET"])
+def create_bulk_companies_from_excel(request):
+    from . import data_models as dm
+    if request.user.is_authenticated:
+        log = dm.save_company_to_db(dm.process_company_excel_file)
+
+        return Response(log, status=status.HTTP_200_OK)
+    
+    return Response("User not authenticated", status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(["POST"])
+def associate_bulk_created_companies_with_company_users(request):
+    if not check_user_type(request.user):
+        return Response({"content": "Invalid Permisions"}, status=status.HTTP_403_FORBIDDEN)
+
+    company_name = request.data.get("name")
+    if request.user.is_authenticated:
+        company = Company.objects.filter(name=company_name).first()
+        company.user = request.user
+        company.full_clean()
+        company.save()
+
+        company_serializer = CompanySerializer(company)
+        return Response(data=company_serializer.data, status=status.HTTP_201_CREATED)
+
 

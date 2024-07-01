@@ -1,7 +1,7 @@
 name; surname; id_number; email; role; duties_csv; departments_csv;  date_started; date_left
-mac1; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
-mac2; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
-mac3; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
-mac4; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
-mac5; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
-mac6; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
+mac11; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
+mac21; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
+mac31; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
+mac41; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
+mac51; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
+mac61; manana; 43 2004077H42; macd@dev.com; thief; sleeping, eating, making out; thuggery, shugary; 2023-07-19; 2024-09-12
