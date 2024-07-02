@@ -126,9 +126,9 @@ def create_or_change_role(current_role=None, new_role=None, batch_item=None, emp
             date_left = batch_item["date_left"],
             employee = employee,
             company = company,
-
         )
-        employee_for_error_message = employee
+        employee_for_error_message = f"{employee.user.first_name} {employee.user.last_name}"
+
 
     print(employee_for_error_message)
     try:

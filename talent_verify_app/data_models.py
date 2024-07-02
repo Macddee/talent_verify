@@ -128,8 +128,8 @@ def process_employees_batch(data_batch):
             "role": data[4].strip(),
             "duties_csv": data[5].strip(),
             "departments_csv": data[6].strip(),
-            "date_started": str(data[7]).strip(),
-            "date_left": str(data[8]).strip() if len(data) > 8 else None
+            "date_started": str(data[7]).strip().split(" ")[0],
+            "date_left": str(data[8]).strip().split(" ")[0] if len(data) > 8 else None
         }
         processed_data_batch.append(processed_data)
     

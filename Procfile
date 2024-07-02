@@ -1,1 +1,1 @@
- web: gunicorn calApiProject.wsgi
+ web: gunicorn talent_verify_project.wsgi
