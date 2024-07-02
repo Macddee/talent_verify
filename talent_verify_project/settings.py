@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-65=vwi0m!242oi50=98@bval2fkh21agqpzuyrze%1m(*(z-2)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["talent-verify-e6886a399610.herokuapp.com"]
+ALLOWED_HOSTS = ["talent-verify-e6886a399610.herokuapp.com", '127.0.0.1']
 
 
 # Application definition
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "talent_verify_app",
-    "rest_framework"
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

@@ -334,9 +334,48 @@ def upload(request):
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["GET"])
 def home(request):
-    pass
 
+    content = [
+                        "AVAILABLE API ENDPOINDS::"
+        "https://talent-verify-e6886a399610.herokuapp.com/",
+        "https://talent-verify-e6886a399610.herokuapp.com/signup/",
+        "https://talent-verify-e6886a399610.herokuapp.com/login/",
+        "https://talent-verify-e6886a399610.herokuapp.com/logout/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-company/",
+        "https://talent-verify-e6886a399610.herokuapp.com/choose-company/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-employee/",
+        "https://talent-verify-e6886a399610.herokuapp.com/change-role/",
+        "https://talent-verify-e6886a399610.herokuapp.com/change-company/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-employees-txt/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-employees-csv/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-employees-excel/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-companies-txt/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-companies-csv/",
+        "https://talent-verify-e6886a399610.herokuapp.com/create-companies-excel/",
+        "https://talent-verify-e6886a399610.herokuapp.com/associate-user-with-company/",
+        "https://talent-verify-e6886a399610.herokuapp.com/search-employees/",
+        "https://talent-verify-e6886a399610.herokuapp.com/change-password/",
+        "https://talent-verify-e6886a399610.herokuapp.com/upload/",
+
+        {"Information - 01": "API endpoints to only be consumed with the talent-verify web app."},
+        {"Information - 02": "email <<macddeemanana@gmail.com>> for the API Docs"},
+        {"Information - 03": ["changes to the database are only persisted in your current session and are deleted once you leave the session.",
+                            "i'm not financially ready to subscribe for a database server for an API that is not used!"]},
+        {"Information - 04": ["bulk upload is working with manually uploading the file with the data in the talent_verify_app directory.",
+                            "there were issues with uploading files via the DRF browsable api. to check this feature please",
+                            "clone this project from <<https://github.com/Macddee/talent_verify>> activate the environment tv_venv\\scripts\\actiavte",
+                            "or simply wait for the frontend to complete!!!"]},
+        {"Information - 05": ["im still thinking wether to enable sending welcome email to bulk geneated users or not sinse this takes some noticeable amount of time.",
+                            "for now its only enabled when creating a single employee and responses are coming after aproximately 3 seconds.",
+                            "could have used Celery to que tasks such that the http response doesn't wait for the sending mail method to complete.",
+                            "however, that would require addons for the message broker like RabbitMQ or Redis, which are paid services again"]}                                                            
+
+
+    ]
+
+    return Response(content, status=status.HTTP_200_OK)
 
 #create company USUER also the admin for the company in question
 @api_view(["GET","POST"])
@@ -376,6 +415,9 @@ def create_user(request):
 
 @api_view(["POST"])
 def login_user(request):
+    """
+    This view logs in a user with a given username and password.
+    """
     username = request.data.get('username')
     password = request.data.get('password')
 
